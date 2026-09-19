@@ -120,7 +120,7 @@ Before using desktop tools:
 
 | Platform | Setup |
 |---|---|
-| macOS | Grant the host Accessibility and Screen Recording access. App scripting may also request Automation access. |
+| macOS | Grant the host Accessibility and Screen Recording access. App scripting may also request Automation access. Until Accessibility is granted, input tools refuse with `accessibility_permission_denied` rather than silently doing nothing. |
 | Windows | Run in a signed-in desktop session. Protected or elevated windows may need matching privileges. |
 | Linux | Use a graphical session with the required X11/Wayland utilities. Accessibility support needs AT-SPI. See [platform details](docs/ARCHITECTURE.md). |
 

@@ -1,5 +1,37 @@
 # Changelog
 
+## Unreleased
+
+macOS permission failures are named and refused rather than silent.
+
+### Fixed
+
+- **Input was silently dropped without Accessibility.** macOS discards `CGEventPost`
+  from a process that is not trusted for Accessibility and reports nothing, so
+  `left_click`, `type`, `key`, `scroll` and every drag tool returned success while
+  nothing happened on screen. Reproduced by running the native module under launchd
+  as an untrusted process: `mouseMove` left the cursor exactly where it was. Every
+  input entry point now refuses with `accessibility_permission_denied` and names
+  the setting to enable.
+- **`doctor` passed Accessibility and Screen Recording it did not have.** The
+  Accessibility check detected the frontmost app, which needs no permission, and
+  the capture check accepted any image, which on some releases is a windowless
+  wallpaper. Both now ask TCC through the native module, so `ok: false` means what
+  it says. A native binary without the probe keeps the behavioural checks.
+- **`screencapture failed` now says why.** A capture that fails without Screen
+  Recording returns `screen_recording_permission_denied` with the setting to
+  enable; any other failure carries the exit status and stderr. The child no
+  longer inherits the server's stdio, so nothing it prints can reach the MCP
+  stdout channel.
+- **`run_script` names Automation.** An Apple event refused with `-1743` appends
+  `automation_permission_denied` and the application to allow, instead of leaving
+  the agent to rewrite a script that was never the problem.
+- **The native pointer overlay flipped against the focused display.** The
+  CoreGraphics-to-AppKit conversion used `NSScreen.mainScreen`, which follows
+  keyboard focus; both coordinate spaces are anchored to the primary display, so
+  the dot landed in the wrong place on a second monitor. It now uses the primary
+  display's height.
+
 ## v7.4.0 (2026-09-12)
 
 Read the browser the person is already signed into, watch what a run costs, stop it,
