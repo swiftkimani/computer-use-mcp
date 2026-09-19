@@ -32,6 +32,15 @@ macOS permission failures are named and refused rather than silent.
   the dot landed in the wrong place on a second monitor. It now uses the primary
   display's height.
 
+### Documentation
+
+- **Cursor setup, and which app owns the macOS permissions.** `AGENTS.md` gains a
+  Cursor section (`~/.cursor/mcp.json` or a project's `.cursor/mcp.json`, the
+  approval prompt, profiles through `env`). It also states the rule the fixes
+  above make visible: macOS attributes Accessibility, Screen Recording and
+  Automation to the app that launches the server, so an IDE host must be granted
+  them itself, and `doctor` has to run from inside that host to report them.
+
 ## v7.4.0 (2026-09-12)
 
 Read the browser the person is already signed into, watch what a run costs, stop it,
