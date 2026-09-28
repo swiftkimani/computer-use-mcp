@@ -404,6 +404,7 @@ mod macos {
     pub fn key_press(combo: String, repeat: Option<i32>) -> napi::Result<()> {
         let map = key_code_map();
         crate::activity::ensure_not_emergency_stopped()?;
+        crate::permissions::ensure_input_trusted()?;
         let repeat = repeat.unwrap_or(1);
         let combo_lower = combo.to_lowercase();
         let parts: Vec<&str> = combo_lower.split('+').map(|s| s.trim()).collect();
@@ -438,14 +439,15 @@ mod macos {
     }
 
     #[napi]
-    pub fn type_text(text: String) {
+    pub fn type_text(text: String) -> napi::Result<()> {
         if crate::activity::emergency_stop_active() {
-            return;
+            return Ok(());
         }
+        crate::permissions::ensure_input_trusted()?;
         let chars: Vec<u16> = text.encode_utf16().collect();
         for chunk in chars.chunks(20) {
             if crate::activity::emergency_stop_active() {
-                return;
+                return Ok(());
             }
             let down = CGEvent::new_keyboard_event(source(), 0, true).unwrap();
             down.set_string_from_utf16_unchecked(chunk);
@@ -454,11 +456,13 @@ mod macos {
             post(up);
             std::thread::sleep(std::time::Duration::from_millis(3));
         }
+        Ok(())
     }
 
     #[napi]
     pub fn hold_key(keys: Vec<String>, duration_ms: i32) -> napi::Result<()> {
         crate::activity::ensure_not_emergency_stopped()?;
+        crate::permissions::ensure_input_trusted()?;
         let map = key_code_map();
         let mut pressed: Vec<(CGKeyCode, CGEventFlags)> = Vec::new();
 
